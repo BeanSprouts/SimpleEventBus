@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 /**
  * Created by shenx on 15-6-30.
  */
+@Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
 @Documented
 public @interface OnEvent {
     ThreadMode threadMode() default ThreadMode.Async;
