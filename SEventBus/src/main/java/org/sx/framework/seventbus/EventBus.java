@@ -124,6 +124,32 @@ public class EventBus {
         });
     }
 
+    public void executeTaskAsync(final EventBusTask task){
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    task.doTask();
+                }catch (Exception e){
+                    onException(e);
+                    task.onException(e);
+                }
+                ThreadMode threadMode=task.getFinishThreadMode();
+                if(threadMode==null){
+                    threadMode=ThreadMode.PostThread;
+                }
+                switch (threadMode){
+                    case MainThread:
+                        mainThreadPoster.deliverTask(task);
+                        break;
+                    default:
+                        task.finish();
+                        break;
+                }
+            }
+        });
+    }
+
     public void onException(final Exception e){
         if(exListenner!=null){
             executor.execute(new Runnable() {

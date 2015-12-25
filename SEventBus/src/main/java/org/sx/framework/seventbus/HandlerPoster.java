@@ -28,6 +28,13 @@ public final class HandlerPoster{
                 } catch (Exception e) {
                     curBus.onException(e);
                 }
+            }else if(msg.obj!=null&&msg.obj instanceof EventBusTask){
+                EventBusTask task=(EventBusTask)msg.obj;
+                try {
+                    task.doFinish();
+                } catch (Exception e) {
+                    curBus.onException(e);
+                }
             }
         }
     }
@@ -54,6 +61,12 @@ public final class HandlerPoster{
     public void deliverEvent(ReceiverWrapper wrapper,Object event){
         Message msg=handler.obtainMessage();
         msg.obj=new EventMessage(wrapper,event);
+        handler.sendMessage(msg);
+    }
+
+    public void deliverTask(EventBusTask task){
+        Message msg=handler.obtainMessage();
+        msg.obj=task;
         handler.sendMessage(msg);
     }
 }

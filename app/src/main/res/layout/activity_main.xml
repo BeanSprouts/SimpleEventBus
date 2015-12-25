@@ -20,7 +20,17 @@
         android:layout_height="wrap_content"
         android:text="Post Event Delayed"
         android:id="@+id/btnPostDelayed"
-        android:layout_below="@+id/btnPost"
+        android:layout_below="@id/btnPost"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Do EventBusTask"
+        android:id="@+id/btnDoTask"
+        android:layout_below="@id/btnPostDelayed"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true" />
 
@@ -29,7 +39,7 @@
         android:layout_height="wrap_content"
         android:text="Main Thread"
         android:id="@+id/tvMain"
-        android:layout_below="@+id/btnPostDelayed"
+        android:layout_below="@id/btnDoTask"
         android:layout_alignParentStart="true"
         android:layout_marginTop="37dp"
         android:layout_alignParentEnd="true" />
@@ -49,6 +59,17 @@
         android:layout_height="wrap_content"
         android:text="BackGround Thread"
         android:id="@+id/tvBackGround"
+        android:layout_below="@+id/tvPost"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BackGround Thread"
+        android:id="@+id/tvTask"
+        android:layout_below="@id/tvBackGround"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true" />

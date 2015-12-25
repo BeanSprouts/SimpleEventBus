@@ -12,8 +12,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.sx.framework.seventbus.EventBus;
+import org.sx.framework.seventbus.EventBusTask;
 import org.sx.framework.seventbus.OnEvent;
 import org.sx.framework.seventbus.ThreadMode;
+import org.w3c.dom.Text;
 
 
 public class MainActivity extends Activity {
@@ -21,7 +23,7 @@ public class MainActivity extends Activity {
     private TextView tvMainThread;
     private TextView tvPostThread;
     private TextView tvBGThread;
-
+    private TextView tvTask;
     private EventBus eventBus;
 
     private int count=0;
@@ -37,9 +39,11 @@ public class MainActivity extends Activity {
         tvMainThread=(TextView)findViewById(R.id.tvMain);
         tvPostThread=(TextView)findViewById(R.id.tvPost);
         tvBGThread=(TextView)findViewById(R.id.tvBackGround);
+        tvTask=(TextView)findViewById(R.id.tvTask);
 
         Button btnPost=(Button)findViewById(R.id.btnPost);
         Button btnPostDelayed=(Button)findViewById(R.id.btnPostDelayed);
+        Button btnDoTask=(Button)findViewById(R.id.btnDoTask);
 
         eventBus.register(this);
 
@@ -59,7 +63,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 MyEvent event=new MyEvent();
                 event.count=++count;
-                eventBus.post(event,"aaa");
+                eventBus.post(event,EventName.EVENT_A);
             }
         });
 
@@ -68,14 +72,20 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 MyEvent event=new MyEvent();
                 event.count=++count;
-                eventBus.postDelayed(event,"aaa",2000);
+                eventBus.postDelayed(event,EventName.EVENT_A,2000);
             }
         });
 
+        btnDoTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventBus.executeTaskAsync(task);
+            }
+        });
     }
 
 
-    @OnEvent(threadMode= ThreadMode.MainThread,eventType="aaa")
+    @OnEvent(threadMode= ThreadMode.MainThread,eventType=EventName.EVENT_A)
     public void onEventMainThread(Object e){
         MyEvent event=null;
         if(e!=null&&e instanceof MyEvent) {
@@ -98,7 +108,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    @OnEvent(threadMode= ThreadMode.PostThread,eventType="aaa")
+    @OnEvent(threadMode= ThreadMode.PostThread,eventType=EventName.EVENT_A)
     public void onEventPost(Object e) {
         MyEvent event=null;
         if(e!=null&&e instanceof MyEvent) {
@@ -138,4 +148,31 @@ public class MainActivity extends Activity {
         super.onDestroy();
         eventBus.unRegister(this);
     }
+
+    public EventBusTask task =new EventBusTask() {
+
+        @Override
+        public void doTask() {
+            try{
+                Thread.sleep(2000);
+            }catch (Exception e){
+
+            }
+        }
+
+        @Override
+        public ThreadMode getFinishThreadMode(){
+            return ThreadMode.MainThread;
+        }
+
+        @Override
+        public void finish() {
+            tvTask.setText("Task finished without error");
+        }
+
+        @Override
+        public void finishWithError(Exception e) {
+            tvTask.setText("Task finished without error:"+e.getMessage());
+        }
+    };
 }

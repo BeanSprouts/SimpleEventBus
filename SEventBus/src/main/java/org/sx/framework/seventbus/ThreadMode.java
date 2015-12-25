@@ -9,7 +9,8 @@ public enum ThreadMode {
      */
     MainThread,
     /**
-     * deliver event in thread that post the event
+     * deliver event in thread that post the event.
+     *
      */
     PostThread,
     /**
