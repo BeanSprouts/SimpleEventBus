@@ -129,10 +129,16 @@ public class EventBus {
             @Override
             public void run() {
                 try {
+                    if(task.isCancelled()){
+                        return;
+                    }
                     task.doTask();
                 }catch (Exception e){
                     onException(e);
                     task.onException(e);
+                }
+                if(task.isCancelled()){
+                    return;
                 }
                 ThreadMode threadMode=task.getFinishThreadMode();
                 if(threadMode==null){
@@ -143,7 +149,7 @@ public class EventBus {
                         mainThreadPoster.deliverTask(task);
                         break;
                     default:
-                        task.finish();
+                        task.doFinish();
                         break;
                 }
             }

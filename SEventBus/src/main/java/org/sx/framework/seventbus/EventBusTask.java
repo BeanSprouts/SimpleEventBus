@@ -6,6 +6,7 @@ package org.sx.framework.seventbus;
 public abstract class EventBusTask {
 
     private Exception e;
+    private volatile boolean cancelled=false;
 
     /**
      * 需要异步执行的具体工作
@@ -29,7 +30,18 @@ public abstract class EventBusTask {
         this.e=e;
     }
 
+    public final void cancel(){
+        cancelled=true;
+    }
+
+    public final boolean isCancelled(){
+        return cancelled;
+    }
+
     public final void doFinish(){
+        if(isCancelled()){
+            return;
+        }
         if(e==null){
             finish();
         }else{
