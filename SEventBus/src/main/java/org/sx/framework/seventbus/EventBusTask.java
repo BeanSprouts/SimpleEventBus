@@ -26,7 +26,7 @@ public abstract class EventBusTask {
 
     public abstract void finishWithError(Exception e);
 
-    public final void onException(Exception e){
+    protected final void onException(Exception e){
         this.e=e;
     }
 

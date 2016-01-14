@@ -2,7 +2,6 @@ package org.sx.framework.seventbus;
 
 import android.os.Looper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,7 +24,7 @@ public class EventBus {
     /**
      * 异常监听器
      */
-    public static interface ExceptionListenner{
+    public interface ExceptionListenner{
         void onException(Exception e);
     }
 
@@ -33,11 +32,27 @@ public class EventBus {
     //
     ////////////////////////////////////////////////////////////////////
 
-    private final ReceiverStorage storage = new ReceiverStorage();
+    private final ReceiverStorage storage = new ReceiverStorage(new ReceiverStorage.ReceiverWrapperAddedListenner() {
+        @Override
+        public void sendStickEvent(ReceiverWrapper wrapper) {
+            Object event=stickEventStore.getStickEvent(wrapper.meta.eventType);
+            if(event==null)return;
+            switch (wrapper.meta.threadMode) {
+                case MainThread:
+                    deliverToMainThread(wrapper, event);
+                    break;
+                case PostThread:
+                case Async:
+                    deliverAsynchronized(wrapper, event);
+                    break;
+            }
+        }
+    });
     private final ExecutorService executor;
     private final HandlerPoster mainThreadPoster;
     private final BackGroundBus bgPoster;
     private ExceptionListenner exListenner;
+    private final StickEventStore stickEventStore=new StickEventStore();
 
     public EventBus() {
         executor = Executors.newCachedThreadPool();
@@ -78,6 +93,11 @@ public class EventBus {
         } catch (InterruptedException ex) {
             post(event,eventType);
         }
+    }
+
+    public void postStick(Object event,String eventType){
+        stickEventStore.newStickEvent(eventType,event);
+        post(event,eventType);
     }
 
     public void post(Object event,String eventType) {

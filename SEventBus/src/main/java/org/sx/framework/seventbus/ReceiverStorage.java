@@ -11,6 +11,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ReceiverStorage {
 
+    public interface ReceiverWrapperAddedListenner{
+        void sendStickEvent(ReceiverWrapper wrapper);
+    }
+
+    private ReceiverWrapperAddedListenner listenner;
+
+    public ReceiverStorage(ReceiverWrapperAddedListenner listenner){
+        this.listenner=listenner;
+    }
+
     /**
      * key:EventType
      * value:List of receivers
@@ -33,6 +43,7 @@ public class ReceiverStorage {
             list=new CopyOnWriteArrayList<ReceiverWrapper>();
             list.add(wrapper);
         }
+        listenner.sendStickEvent(wrapper);
         CopyOnWriteArrayList<ReceiverWrapper> temp= receiverMap.putIfAbsent(wrapper.meta.eventType, list);
         if(temp!=null){
             temp.add(wrapper);
